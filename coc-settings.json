@@ -1,0 +1,7 @@
+{ 
+  "eslint": {
+    "packageManager": "yarn",
+    "coc.preferences.formatOnSaveFiletypes": ["javascript", "typescript", "typescriptreact", "json", "javascriptreact", "typescript.tsx"],
+    "eslint.filetypes": ["javascript", "typescript", "typescriptreact", "javascriptreact", "typescript.tsx"]
+  }
+}
