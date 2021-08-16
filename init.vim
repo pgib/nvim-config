@@ -11,6 +11,7 @@ call plug#begin("~/.vim/plugged")
   Plug 'tpope/vim-fugitive'
   Plug 'scrooloose/nerdcommenter'
   Plug 'folke/tokyonight.nvim'
+  Plug 'phaazon/hop.nvim'
 call plug#end()
 "Config Section
 
