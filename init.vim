@@ -11,6 +11,7 @@ call plug#begin("~/.vim/plugged")
   Plug 'tpope/vim-fugitive'
   Plug 'scrooloose/nerdcommenter'
   Plug 'folke/tokyonight.nvim'
+  Plug 'sainnhe/sonokai'
   Plug 'phaazon/hop.nvim'
 call plug#end()
 "Config Section
@@ -24,7 +25,13 @@ let g:onedark_termcolors=256
 set background=dark
 "colorscheme gruvbox
 let g:tokyonight_style = "night"
-colorscheme tokyonight
+"colorscheme tokyonight
+"let g:sonokai_style = "default"
+"let g:sonokai_style = "atlantis"
+let g:sonokai_style = "andromeda"
+"let g:sonokai_style = "shusia"
+"let g:sonokai_style = "maia"
+colorscheme sonokai
 
 " Automaticaly close nvim if NERDTree is only thing left open
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
@@ -45,6 +52,7 @@ nnoremap <A-h> <C-w>h
 nnoremap <A-j> <C-w>j
 nnoremap <A-k> <C-w>k
 nnoremap <A-l> <C-w>l
+inoremap jk <Esc>
 
 " simple back and forth between windows
 map ` <C-W>w
@@ -111,3 +119,6 @@ nnoremap <CR> :noh<CR><CR>
 
 " Completion
 let g:coc_global_extensions = ['coc-tabnine', 'coc-emmet', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver', 'coc-eslint']
+
+" Fix an indentation issue
+let g:polyglot_disabled = ['jsx']
