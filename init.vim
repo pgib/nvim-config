@@ -1,20 +1,44 @@
+" Fix an indentation issue
+let g:polyglot_disabled = ['jsx']
+
+" Recommended to disable for NvimTree
+let g:loaded_netrw       = 1
+let g:loaded_netrwPlugin = 1
+
 call plug#begin("~/.vim/plugged")
   " Plugin Section
   Plug 'dracula/vim'
   Plug 'morhetz/gruvbox'
-  Plug 'scrooloose/nerdtree'
+  "Plug 'scrooloose/nerdtree'
+  Plug 'nvim-tree/nvim-web-devicons' " optional, for file icons
+  Plug 'nvim-tree/nvim-tree.lua'
   Plug 'ryanoasis/vim-devicons'
-  Plug 'junegunn/fzf.vim'
+  Plug 'ibhagwan/fzf-lua', {'branch': 'main'}
+  Plug 'junegunn/fzf.vim', { 'do': { -> fzf#install() } }
   Plug 'neoclide/coc.nvim', {'branch': 'release'}
+  Plug 'neoclide/vim-jsx-improve'
+  Plug 'williamboman/mason.nvim'
+  Plug 'williamboman/mason-lspconfig.nvim'
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'jlanzarotta/bufexplorer'
   Plug 'sheerun/vim-polyglot'
   Plug 'tpope/vim-fugitive'
+  Plug 'kdheepak/lazygit.nvim'
   Plug 'scrooloose/nerdcommenter'
   Plug 'folke/tokyonight.nvim'
   Plug 'sainnhe/sonokai'
   Plug 'phaazon/hop.nvim'
+  Plug 'farmergreg/vim-lastplace'
+  Plug 'mrjones2014/dash.nvim', { 'do': 'make install' }
+  "Plug 'feline-nvim/feline.nvim' " status line
+  Plug 'nvim-lualine/lualine.nvim' " status line
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'eandrju/cellular-automaton.nvim'
+  Plug 'codota/tabnine-nvim', { 'do': './dl_binaries.sh' }
 call plug#end()
 "Config Section
+"let g:polyglot_disabled = ['jsx']
 
 if (has("termguicolors"))
  set termguicolors
@@ -34,14 +58,78 @@ let g:sonokai_style = "andromeda"
 colorscheme sonokai
 
 " Automaticaly close nvim if NERDTree is only thing left open
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+"autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 " Load NERDtree if no files specified
 "autocmd vimenter * if !argc() | NERDTree | endif
 autocmd BufEnter * :syn sync maxlines=256
 
+"-- disable netrw at the very start of your init.lua (strongly advised)
+"vim.g.loaded_netrw = 1
+"vim.g.loaded_netrwPlugin = 1
+
+"-- set termguicolors to enable highlight groups
+"vim.opt.termguicolors = true
+
+"-- empty setup using defaults
+lua require("mason").setup()
+lua require("nvim-tree").setup()
+"lua require('feline').setup()
+"lua require('feline').winbar.setup()
+lua require('lspconfig').tsserver.setup({ filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" } })
+lua require('lspconfig').solargraph.setup({ userconfig = {}})
+
+lua <<EOF
+require('tabnine').setup({
+  disable_auto_comment=true,
+  accept_keymap="<Tab>",
+  dismiss_keymap = "<C-]>",
+  debounce_ms = 800,
+  suggestion_color = {gui = "#808080", cterm = 244},
+  execlude_filetypes = {"TelescopePrompt"}
+})
+EOF
+
+lua <<EOF
+require('lualine').setup({
+  tabline = {
+    lualine_a = {},
+    lualine_b = {'branch'},
+    lualine_c = {'filename'},
+    lualine_x = {},
+    lualine_y = {},
+    lualine_z = {}
+  },
+  sections = {lualine_c = {'lsp_progress'}, lualine_x = {'tabnine'}},
+  options = { theme  = 'OceanicNext' }
+})
+EOF
+
+"-- OR setup with some options
+"require("nvim-tree").setup({
+"  sort_by = "case_sensitive",
+"  view = {
+"    adaptive_size = true,
+"    mappings = {
+"      list = {
+"        { key = "u", action = "dir_up" },
+"      },
+"    },
+"  },
+"  renderer = {
+"    group_empty = true,
+"  },
+"  filters = {
+"    dotfiles = true,
+"  },
+"})
+
 let mapleader = ","
-nmap <Leader>, :NERDTreeToggle<cr>
+"nmap <Leader>, :NERDTreeToggle<cr>
+nmap <Leader>, :NvimTreeToggle<cr>
 nmap <Leader>bb :BufExplorer<cr>
+nmap <Leader>fml :CellularAutomaton make_it_rain<cr>
+
+nnoremap <silent> <leader>lg :LazyGit<CR>
 
 " use alt+hjkl to move between split/vsplit panels
 tnoremap <A-h> <C-\><C-n><C-w>h
@@ -56,7 +144,9 @@ inoremap jk <Esc>
 
 " simple back and forth between windows
 map ` <C-W>w
+map <Bslash> <C-W>w
 map ~ <C-W>p
+"map | <C-W>p
 
 "-[ Indents and tabs ] {{{
   set tabstop=2                  " four is the best number ever (especially when combined with 2)
@@ -108,7 +198,8 @@ nmap <Leader>ff :Files<CR>
 nmap <Leader>T :Tags<CR>
 nmap <Leader>t :GitFiles<CR>
 "nmap <Leader>t :call fzf#run(fzf#wrap({'source': 'git ls-files --exclude-standard --others --cached'}))<CR>
-nmap <Leader>n :NERDTreeFind<CR>
+"nmap <Leader>n :NERDTreeFind<CR>
+nmap <Leader>n :NvimTreeFindFile<CR>
 
 " Copy and paste to and from the OS X clipboard
 vmap <Leader>c y:call system("pbcopy", getreg("\""))<CR>
@@ -117,8 +208,14 @@ nmap <Leader>v :call setreg("\"",system("pbpaste"))<CR>p
 " clear the last search highlight by pressing enter after a search
 nnoremap <CR> :noh<CR><CR>
 
-" Completion
-let g:coc_global_extensions = ['coc-tabnine', 'coc-emmet', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver', 'coc-eslint']
+" Highlight trailing whitespace as an error
+match errorMsg /\s\+$/
 
-" Fix an indentation issue
-let g:polyglot_disabled = ['jsx']
+" Completion
+"let g:coc_global_extensions = ['coc-tabnine', 'coc-emmet', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver', 'coc-eslint']
+let g:coc_global_extensions = ['coc-emmet', 'coc-css', 'coc-html', 'coc-json', 'coc-prettier', 'coc-tsserver', 'coc-eslint']
+inoremap <silent><expr> <CR> coc#pum#visible() ? coc#pum#confirm() : "\<CR>"
+
+" File-type overrides
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+autocmd bufnewfile,bufread *.jsx set filetype=javascript.jsx
